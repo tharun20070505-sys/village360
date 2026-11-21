@@ -1,5 +1,13 @@
 import 'dotenv/config';
+import dns from 'node:dns';
 import mongoose from 'mongoose';
+
+try {
+  dns.setServers(['8.8.8.8', '1.1.1.1']);
+} catch {
+  // Ignore in sandboxed or custom environments
+}
+
 export const production = process.env.NODE_ENV === 'production';
 export const origin = process.env.FRONTEND_URL || 'http://localhost:5173';
 export function secret() {
