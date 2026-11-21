@@ -4,8 +4,9 @@ import {PageHeading,Select,Input,ErrorState,LoadingState,Empty,pairs,items,useRe
 const groups=[['villages','Villages'],['wards','Wards'],['users','People'],['assignments','Assignments'],['audit','Audit history']];
 const targets=[['households','Households'],['infrastructure','Infrastructure locations'],['farmers','Farmer interactions'],['shgs','Self-help groups'],['consultations','Panchayat consultations'],['students','Students']];
 const initial={households:0,infrastructure:30,farmers:15,shgs:5,consultations:3,students:25};
+const roleOptions=[['admin','Administrator (Full access)'],['surveyor','Surveyor / student'],['viewer','Faculty coordinator']];
 function Form({kind,editing,setEditing,options,onWrite,working}) {
-  const [v,setV]=useState(()=>({...editing, name:editing?.name || '', email:'', password:'',role:'surveyor',village:'',user:'',team:'',targets:{...initial,...editing?.targets}}));
+  const [v,setV]=useState(()=>({...editing, name:editing?.name || '', email:editing?.email || '', password:'',role:editing?.role || 'surveyor',village:editing?.village || '',user:editing?.user || '',team:editing?.team || '',targets:{...initial,...editing?.targets}}));
   const set=(k,x)=>setV({...v,[k]:x});
   const title=(editing?'Edit ':'Create ')+({villages:'village',wards:'ward',users:'account',assignments:'assignment'}[kind]);
   const optionsUsers=(options.users || []).filter(u=>u.role==='surveyor'&&u.active!==false).map(u=>[u._id,u.name+' · '+(u.publicId||u.email)]);
@@ -13,7 +14,7 @@ function Form({kind,editing,setEditing,options,onWrite,working}) {
     event.preventDefault();
     const payload=kind==='villages'?{name:v.name,targets:Object.fromEntries(Object.entries(v.targets).map(([k,x])=>[k,Number(x)]))}
       :kind==='wards'?(editing?{name:v.name}:{name:v.name,village:v.village})
-      :kind==='users'?{name:v.name,email:v.email,password:v.password,role:v.role}
+      :kind==='users'?(editing?{name:v.name,role:v.role,...(v.password?{password:v.password}:{})}:{name:v.name,email:v.email,password:v.password,role:v.role})
       :{user:v.user,village:v.village,...(v.team?{team:v.team}:{})};
     await onWrite(editing?'patch':'post','/'+kind+(editing?'/'+editing._id:''),payload,title+' completed.');
   };
@@ -21,7 +22,9 @@ function Form({kind,editing,setEditing,options,onWrite,working}) {
     {kind!=='assignments'&&<Input label={kind==='users'?'Display name':'Name'} value={v.name} maxLength={100} required onChange={e=>set('name',e.target.value)}/>}
     {kind==='villages'&&<fieldset className="ws-fields"><legend>Pilot targets</legend>{targets.map(([key,label])=><Input key={key} label={label} type="number" min="0" max="1000000" required value={v.targets[key]} onChange={e=>set('targets',{...v.targets,[key]:e.target.value})}/>)}</fieldset>}
     {((kind==='wards'&&!editing)||kind==='assignments') && <Select label="Village" options={pairs(options.villages)} all="Choose village" value={v.village} onChange={x=>set('village',x)} required/>}
-    {kind==='users'&&<><Input label="Email" type="email" autoComplete="off" required value={v.email} onChange={e=>set('email',e.target.value)}/><Select label="Role" options={ [['surveyor','Surveyor / student'],['viewer','Faculty coordinator']] } value={v.role} required onChange={x=>set('role',x)}/><Input label="Initial password" type="password" autoComplete="new-password" required minLength={12} maxLength={128} value={v.password} onChange={e=>set('password',e.target.value)}/></>}
+    {kind==='users'&&<>{!editing&&<Input label="Email" type="email" autoComplete="off" required value={v.email} onChange={e=>set('email',e.target.value)}/>}
+      <Select label="Role" options={roleOptions} value={v.role} required onChange={x=>set('role',x)}/>
+      <Input label={editing?"New password (leave blank to keep current)":"Initial password"} type="password" autoComplete="new-password" required={!editing} minLength={12} maxLength={128} value={v.password} onChange={e=>set('password',e.target.value)}/></>}
     {kind==='assignments'&&<><Select label="Surveyor" options={optionsUsers} all="Choose surveyor" required value={v.user} onChange={x=>set('user',x)}/><Input label="Team (optional)" value={v.team} maxLength={80} onChange={e=>set('team',e.target.value)}/></>}
     <button type="submit" className="ws-primary" disabled={working}>{working?'Saving…':editing?'Save changes':title}</button>
     {editing&&<button type="button" onClick={()=>setEditing(null)}>Cancel</button>}
@@ -55,7 +58,7 @@ export default function Admin(){
   const values=row=>{
     if(kind==='villages')return [row.name,targets.map(([k,t])=>row.targets?.[k]>0?t+' '+row.targets[k]:null).filter(Boolean).join(' · ')||'—',<button onClick={()=>edit(row)}>Edit</button>];
     if(kind==='wards')return [row.name,labelById(villages.data,row.village),<button onClick={()=>edit(row)}>Edit</button>];
-    if(kind==='users')return [<>{row.name}<br/><small>{row.email} · {row.publicId}</small></>,row.role,row.active?'Active':'Inactive',row.role==='admin'?'—':<button onClick={()=>setConfirm(row)}>{row.active?'Deactivate':'Activate'}</button>];
+    if(kind==='users')return [<>{row.name}<br/><small>{row.email} · {row.publicId}</small></>,row.role==='admin'?'Administrator':row.role==='viewer'?'Faculty coordinator':'Surveyor',row.active?'Active':'Inactive',<div key={row._id} style={{display:'inline-flex',gap:'0.4rem'}}><button type="button" onClick={()=>edit(row)}>Edit</button><button type="button" onClick={()=>setConfirm(row)}>{row.active?'Deactivate':'Activate'}</button></div>];
     if(kind==='assignments')return [labelById(users.data,row.user),labelById(villages.data,row.village),row.team||'—',<button onClick={()=>setConfirm(row)}>Remove</button>];
     return [new Date(row.createdAt).toLocaleString(),row.action,<>{row.kind}<br/><small>{row.record||row.publicId}</small></>,labelById(users.data,row.createdBy),row.changes&&Object.keys(row.changes).length?<details><summary>View changes</summary><pre className="ws-changes">{JSON.stringify(row.changes,null,2)}</pre></details>:'—'];
   };
