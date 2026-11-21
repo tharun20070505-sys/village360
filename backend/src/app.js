@@ -1,0 +1,42 @@
+import express from 'express';
+import helmet from 'helmet';
+import cors from 'cors';
+import {rateLimit} from 'express-rate-limit';
+import cookieParser from 'cookie-parser';
+import mongoose from 'mongoose';
+import { ZodError } from 'zod';
+import { origin, production } from './config/env.js';
+import { authenticate,browserOrigin } from './middleware/session.js';
+import { auth } from './routes/auth.js';
+import { adminRoutes } from './routes/admin.js';
+import { surveyRoutes } from './routes/surveys.js';
+import { reports } from './routes/reports.js';
+
+export const app=express();
+app.disable('x-powered-by');
+const hops=Number(process.env.TRUST_PROXY_HOPS||0);
+if(!Number.isInteger(hops)||hops<0||hops>5)throw new Error('Invalid proxy configuration.');
+app.set('trust proxy',hops);
+app.use(helmet(),cors({origin,credentials:true,methods:['GET','POST','PATCH','PUT','DELETE','OPTIONS'],allowedHeaders:['Content-Type','X-CSRF-Token','Idempotency-Key']}));
+app.use('/api',(req,res,next)=>{res.set('Cache-Control','no-store');next();});
+app.get('/api/health',(req,res)=>{
+  const ready=mongoose.connection.readyState===1;
+  res.status(ready?200:503).json({status:ready?'ok':'unavailable',database:ready?'connected':'disconnected'});
+});
+app.use('/api',rateLimit({windowMs:60000,limit:240,standardHeaders:'draft-7',legacyHeaders:false,message:{error:'Request limit reached. Please retry shortly.'}}));
+app.use(browserOrigin,express.json({limit:'128kb'}),cookieParser());
+app.use('/api/auth',auth);
+app.use('/api',authenticate,adminRoutes,surveyRoutes,reports);
+app.use((req,res)=>res.status(404).json({error:'Endpoint not found.'}));
+app.use((err,req,res,next)=>{
+  if(res.headersSent)return next(err);
+  if(err instanceof ZodError)return res.status(422).json({error:'Check the submitted fields.',fields:err.issues.map(i=>({field:i.path.join('.'),message:i.message}))});
+  if(err.code===11000)return res.status(409).json({error:'A record with that reference already exists.'});
+  if(err.code==='LIMIT_FILE_SIZE')return res.status(413).json({error:'Photographs must be 2 MB or smaller.'});
+  if(err.name==='MulterError')return res.status(422).json({error:'Invalid photograph upload.'});
+  if(err.type==='entity.parse.failed')return res.status(400).json({error:'Invalid JSON.'});
+  const status=err.status>=400&&err.status<=599?err.status:500;
+  if(status>=500)console.error('API error',err.name,err.code??'',production?'':err.message);
+  res.status(status).json({error:status>=500?'Unable to complete the database operation.':err.message});
+});
+export default app;

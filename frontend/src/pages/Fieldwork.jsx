@@ -1,0 +1,4 @@
+import {Link} from 'react-router-dom';
+import {House,TriangleAlert,Building2,Sprout,Users,Landmark,GraduationCap} from 'lucide-react';
+const types=[['households','Household surveys',House],['problems','Village problems',TriangleAlert],['infrastructure','Infrastructure observations',Building2],['farmers','Farmer interactions',Sprout],['shgs','Self-help groups',Users],['consultations','Panchayat consultations',Landmark],['students','Student participation',GraduationCap]];
+export default function Fieldwork(){return <section className="fieldHub"><h1>Fieldwork</h1><p>Collect a survey or open a previous submission.</p><div>{types.map(([kind,name,Icon])=><article key={kind}><Icon size={23}/><h2>{name}</h2><Link to={'/surveys/'+kind+'/new'}>Start form</Link><Link to={'/records/'+kind}>View records</Link></article>)}</div></section>;}
