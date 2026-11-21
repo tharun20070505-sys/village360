@@ -93,12 +93,15 @@ export default function Home() {
       <main>
         <section className="v360-hero" id="overview" aria-labelledby="v360-title">
           <picture>
-            <source media="(max-width: 680px)" srcSet="/assets/village-fieldwork-small.webp" />
+            <source media="(max-width: 680px)" srcSet="/assets/village-fieldwork-small.webp" width="800" height="267" type="image/webp" />
             <img
               className="v360-hero-img"
               src="/assets/village-fieldwork.webp"
               alt="A rural village surrounded by cultivated fields, coconut palms and distant hills"
               fetchPriority="high"
+              width="1600"
+              height="533"
+              decoding="async"
             />
           </picture>
           <div className="v360-wrap v360-hero-content v360-reveal is-visible">

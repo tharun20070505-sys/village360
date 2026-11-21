@@ -1,0 +1,70 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "specVersion": "1.0",
+  "host": {
+    "displayName": "Village 360°",
+    "identifier": "did:web:village360.local",
+    "documentationUrl": "https://village360.local/llms.txt",
+    "logoUrl": "https://village360.local/assets/village-fieldwork-small.webp"
+  },
+  "entries": [
+    {
+      "identifier": "urn:air:village360.local:api:discovery",
+      "displayName": "Village 360 Field Survey Discovery API",
+      "type": "application/openapi+json",
+      "url": "https://village360.local/api/discovery",
+      "description": "Exposes metadata, schemas, validation rules, and endpoint specifications for all 7 survey instruments (households, problems, infrastructure, farmers, shgs, consultations, students) and Coimbatore administrative divisions (235 Panchayats, 2,041 Wards).",
+      "version": "1.0.0",
+      "tags": [
+        "surveys",
+        "coimbatore",
+        "fieldwork",
+        "governance",
+        "panchayats"
+      ],
+      "representativeQueries": [
+        "Discover available rural survey modules",
+        "Inspect household survey schema and required fields",
+        "List Coimbatore village panchayats and wards"
+      ],
+      "updatedAt": "2026-11-21T12:00:00Z"
+    },
+    {
+      "identifier": "urn:air:village360.local:telemetry:metrics",
+      "displayName": "Village 360 Performance Telemetry",
+      "type": "application/json",
+      "url": "https://village360.local/api/telemetry/metrics",
+      "description": "Real-time metrics exposing p50, p95, p99 response latency, circuit breaker status, and rate limit telemetry for admin observers.",
+      "version": "1.0.0",
+      "tags": [
+        "telemetry",
+        "observability",
+        "circuit-breaker",
+        "rate-limiting"
+      ],
+      "representativeQueries": [
+        "Check API p95 response time",
+        "Inspect MongoDB circuit breaker state"
+      ],
+      "updatedAt": "2026-11-21T12:00:00Z"
+    },
+    {
+      "identifier": "urn:air:village360.local:docs:llmstxt",
+      "displayName": "Village 360 LLM Context Specification",
+      "type": "text/markdown",
+      "url": "https://village360.local/llms.txt",
+      "description": "Standardized markdown documentation map outlining project architecture, survey methodologies, and data schemas for LLMs.",
+      "version": "1.0.0",
+      "tags": [
+        "llms",
+        "documentation",
+        "knowledge-base"
+      ],
+      "representativeQueries": [
+        "What is Village 360?",
+        "How do surveyors submit records?"
+      ],
+      "updatedAt": "2026-11-21T12:00:00Z"
+    }
+  ]
+}

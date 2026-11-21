@@ -1,1 +1,30 @@
-<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#103e32"><meta name="description" content="Village 360° field surveys and development research"><title>Village 360° | Survey workspace</title></head><body><div id="root"></div><script type="module" src="/src/main.jsx"></script></body></html>
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="theme-color" content="#103e32">
+  <meta name="description" content="Village 360° field surveys, rural governance research, and development data management.">
+  <title>Village 360° | Digital Village Survey &amp; Development Workspace</title>
+  
+  <!-- Critical LCP Preload: Hero background image loads immediately in parallel with HTML parsing -->
+  <link rel="preload" as="image" href="/assets/village-fieldwork-small.webp" media="(max-width: 680px)" type="image/webp" fetchpriority="high">
+  <link rel="preload" as="image" href="/assets/village-fieldwork.webp" media="(min-width: 681px)" type="image/webp" fetchpriority="high">
+
+  <!-- AI & Agentic Discovery Links -->
+  <link rel="alternate" type="application/json" href="/ai-catalog.json" title="AI Catalog">
+  <link rel="alternate" type="text/markdown" href="/llms.txt" title="LLM Context">
+
+  <!-- Minimal Critical CSS to eliminate layout shift and speed up First Contentful Paint -->
+  <style>
+    :root { --pine:#123c2c; --leaf:#166848; --ink:#193529; --muted:#58665f; }
+    html, body { margin:0; padding:0; background:#fff; color:var(--ink); font-family:Inter,"Segoe UI",Arial,sans-serif; overflow-x:hidden; max-width:100%; -webkit-font-smoothing:antialiased; }
+    #root { min-height:100vh; }
+    .v360-hero { position:relative; min-height:480px; background:#254934; color:white; }
+  </style>
+</head>
+<body>
+  <div id="root"></div>
+  <script type="module" src="/src/main.jsx"></script>
+</body>
+</html>

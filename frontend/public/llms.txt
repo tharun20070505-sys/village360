@@ -1,0 +1,30 @@
+# Village 360
+
+> Digital village survey, rural development fieldwork, and governance data management platform covering 235 Village Panchayats and 2,041 Wards in Coimbatore district.
+
+Village 360° provides an end-to-end digital infrastructure for student survey teams, faculty researchers, and administrative coordinators to collect, verify, and analyze rural development data with cryptographic verification and enterprise reliability.
+
+## Core Survey Modules
+
+- [Household Survey](https://village360.local/surveys/households/new): Comprehensive household demographic assessment, living condition records, water supply access, sanitation facilities, and welfare scheme enrollment.
+- [Village Problems](https://village360.local/surveys/problems/new): Field grievance and infrastructure deficit reporting including road deterioration, streetlighting faults, drainage blockages, and waste disposal needs.
+- [Infrastructure Audit](https://village360.local/surveys/infrastructure/new): Physical audit of village assets including schools, Anganwadis, primary health centres, community halls, and overhead drinking water tanks.
+- [Farmer Survey](https://village360.local/surveys/farmers/new): Agricultural census capturing landholding size, crop varieties, irrigation systems (borewell/canal/drip), pest challenges, and crop insurance participation.
+- [Self-Help Groups](https://village360.local/surveys/shgs/new): Women empowerment and microfinance audit documenting SHG savings, bank loan repayment rates, livelihood ventures, and training requirements.
+- [Panchayat Consultations](https://village360.local/surveys/consultations/new): Gram Sabha consultation records, village leader priorities, ongoing development projects, and fund allocation resolutions.
+- [Student Participation](https://village360.local/surveys/students/new): Fieldwork team logs tracking student enumerator rosters, assigned wards, supervised visits, and community interaction hours.
+
+## Administrative Boundaries
+
+- [Coimbatore District Panchayats](https://village360.local/api/records/panchayats): 235 recognized Village Panchayats across 12 Community Development blocks (Anaimalai, Annur, Karamadai, Kinathukadavu, Madukkarai, Periyanayakkanpalayam, Pollachi North, Pollachi South, Sarkarsamakulam, Sultanpet, Sulur, Thondamuthur).
+- [Coimbatore Ward Records](https://village360.local/api/records/wards): 2,041 surveyed wards linked with localized census codes and geographic references.
+
+## System & API Endpoints
+
+- [Survey Discovery API](https://village360.local/api/discovery): OpenAPI-compatible JSON discovery specification enumerating all schemas, field types, validation rules, and available modules.
+- [System Telemetry API](https://village360.local/api/telemetry/metrics): Observability endpoint providing p50, p95, p99 response times, MongoDB circuit breaker health, and rate limiter status.
+- [AI Catalog Manifest](https://village360.local/ai-catalog.json): Standardized Agentic Resource Discovery manifest for autonomous AI tools and crawlers.
+
+## Optional
+
+- [Full Documentation](https://village360.local/llms-full.txt): Comprehensive technical guide detailing the complete database schema, validation rules, role-based permissions, and deployment architecture.

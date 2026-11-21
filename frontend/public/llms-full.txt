@@ -1,0 +1,94 @@
+# Village 360 - Full Technical Documentation & Knowledge Base
+
+> Comprehensive technical specification, database models, REST APIs, and administrative datasets for the Village 360° platform.
+
+## Architecture & Technology Stack
+
+- Frontend: React 18, React Router v6, Vite, Lucide Icons, Recharts, Custom CSS Modules.
+- Backend: Node.js 20+, Express, MongoDB 8 (Mongoose ODM), Helmet, Express-Rate-Limit, Compression.
+- Resiliency: In-memory sliding-window response time telemetry, Circuit Breaker pattern with half-open probing, Multi-process CPU clustering, In-memory TTL caching.
+- Security: HTTP-only secure cookies, CSRF token validation, strict browser origin enforcement, input sanitization via Zod schemas.
+
+## Survey Module Schemas
+
+### 1. Household Survey (`/surveys/households/new`)
+- Fields:
+  - `panchayat`: String, Village Panchayat name.
+  - `ward`: String, Ward identifier (1 to 15).
+  - `respondentName`: String, Name of household head or respondent.
+  - `membersCount`: Integer (>= 1).
+  - `housingType`: Enum ('Kaccha', 'Pucca', 'Semi-Pucca').
+  - `drinkingWaterSource`: Enum ('Tap water', 'Borewell', 'Public tanker', 'Handpump').
+  - `sanitationFacility`: Enum ('Individual household latrine', 'Community toilet', 'Open defecation').
+  - `electricityAccess`: Boolean.
+  - `governmentSchemes`: Array of strings (e.g., 'PM-KISAN', 'MGNREGA', 'PMAY').
+
+### 2. Village Problems (`/surveys/problems/new`)
+- Fields:
+  - `panchayat`: String.
+  - `ward`: String.
+  - `category`: Enum ('Roads & Transport', 'Drinking Water', 'Street Lighting', 'Sanitation & Waste', 'Electricity', 'Health & Education').
+  - `severity`: Enum ('Critical', 'Moderate', 'Low').
+  - `description`: String (up to 2000 chars).
+  - `locationCoordinates`: Optional latitude/longitude pair.
+  - `photoUrl`: Optional uploaded image reference (max 2 MB).
+
+### 3. Infrastructure Audit (`/surveys/infrastructure/new`)
+- Fields:
+  - `panchayat`: String.
+  - `facilityType`: Enum ('Primary School', 'Anganwadi', 'Primary Health Centre', 'Community Hall', 'Fair Price Shop', 'Overhead Tank').
+  - `operationalCondition`: Enum ('Functional', 'Needs Repair', 'Dilapidated / Non-functional').
+  - `cleanlinessRating`: Number (1-5).
+  - `waterElectricityAvailable`: Boolean.
+
+### 4. Farmer Survey (`/surveys/farmers/new`)
+- Fields:
+  - `farmerName`: String.
+  - `panchayat`: String.
+  - `landSizeAcres`: Number (>= 0).
+  - `irrigationSource`: Enum ('Borewell', 'Canal', 'Rainfed', 'Drip / Sprinkler').
+  - `majorCrops`: Array of strings.
+  - `creditSource`: Enum ('Institutional Bank', 'Cooperative Society', 'Private Moneylender', 'None').
+
+### 5. Self-Help Groups (`/surveys/shgs/new`)
+- Fields:
+  - `groupName`: String.
+  - `panchayat`: String.
+  - `totalMembers`: Number (typically 10-20).
+  - `monthlySavingsPerMember`: Number in INR.
+  - `primaryActivity`: String.
+  - `bankLoanStatus`: Enum ('No active loan', 'Regularly repaying', 'Overdue').
+
+### 6. Panchayat Consultations (`/surveys/consultations/new`)
+- Fields:
+  - `panchayat`: String.
+  - `meetingDate`: ISO Date.
+  - `attendeesCount`: Number.
+  - `keyResolutions`: Array of strings.
+  - `allocatedBudgetEstimate`: Number in INR.
+
+### 7. Student Participation (`/surveys/students/new`)
+- Fields:
+  - `studentRollNumber`: String.
+  - `studentName`: String.
+  - `institution`: String.
+  - `assignedPanchayats`: Array of strings.
+  - `surveysConducted`: Number.
+
+## Administrative Boundaries (Coimbatore District)
+
+Coimbatore district encompasses 235 Village Panchayats organized into 12 blocks:
+- Anaimalai Block (19 Panchayats)
+- Annur Block (21 Panchayats)
+- Karamadai Block (17 Panchayats)
+- Kinathukadavu Block (34 Panchayats)
+- Madukkarai Block (9 Panchayats)
+- Periyanayakkanpalayam Block (9 Panchayats)
+- Pollachi North Block (39 Panchayats)
+- Pollachi South Block (26 Panchayats)
+- Sarkarsamakulam Block (8 Panchayats)
+- Sultanpet Block (20 Panchayats)
+- Sulur Block (17 Panchayats)
+- Thondamuthur Block (10 Panchayats)
+
+Total surveyed wards: 2,041 wards mapped with individual panchayat parent IDs.
