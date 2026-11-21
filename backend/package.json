@@ -5,6 +5,7 @@
   "type": "module",
   "scripts": {
     "start": "node src/server.js",
+    "start:cluster": "node src/cluster.js",
     "dev": "node --watch src/server.js",
     "setup-admin": "node scripts/setup-admin.js",
     "seed:coimbatore": "node scripts/seed-coimbatore.js",
@@ -16,6 +17,7 @@
   },
   "dependencies": {
     "argon2": "^0.44.0",
+    "compression": "^1.8.2",
     "cookie-parser": "^1.4.7",
     "cors": "^2.8.5",
     "dotenv": "^16.6.1",

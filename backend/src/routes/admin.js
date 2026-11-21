@@ -3,6 +3,7 @@ import { z } from 'zod';
 import argon2 from 'argon2';
 import { Assignment,Audit,User,Village,Ward,Session,targetDefaults } from '../models/index.js';
 import { fail,id,objectId,text,page,log,transaction,requireRoles,publicRecord } from '../utils/http.js';
+import { cache } from '../utils/cache.js';
 export const adminRoutes=Router();
 const admin=requireRoles('admin');
 export async function villageScope(user){
@@ -24,12 +25,21 @@ async function add(model,data,req,kind){
   return transaction(async session=>{
     const [saved]=await model.create([{...data,createdBy:req.user._id}],{session});
     await log(session,req.user,'create',kind,saved._id);
+    cache.invalidateTag(kind);
+    cache.invalidateTag('discovery');
     return publicRecord(saved);
   });
 }
 adminRoutes.get('/villages',async(req,res)=>{
   const scope=await villageScope(req.user);
-  res.json(await page(Village,scope.village?{_id:scope.village}:{},req.query));
+  const userKey=req.user.role==='surveyor'?req.user._id:'all';
+  const cacheKey=`villages:${userKey}:${JSON.stringify(req.query)}`;
+  const cached=cache.get(cacheKey);
+  if(cached){res.set('X-Cache','HIT');return res.json(cached);}
+  const result=await page(Village,scope.village?{_id:scope.village}:{},req.query);
+  cache.set(cacheKey,result,120,'villages');
+  res.set('X-Cache','MISS');
+  res.json(result);
 });
 adminRoutes.get('/villages/:id',async(req,res)=>{
   const key=id(req.params.id);await allowedVillage(req.user,key);
@@ -39,7 +49,14 @@ adminRoutes.post('/villages',admin,async(req,res)=>res.status(201).json(await ad
 adminRoutes.get('/wards',async(req,res)=>{
   const q=await villageScope(req.user);
   if(req.query.village){q.village=id(req.query.village);await allowedVillage(req.user,q.village);}
-  res.json(await page(Ward,q,req.query));
+  const userKey=req.user.role==='surveyor'?req.user._id:'all';
+  const cacheKey=`wards:${userKey}:${JSON.stringify(req.query)}`;
+  const cached=cache.get(cacheKey);
+  if(cached){res.set('X-Cache','HIT');return res.json(cached);}
+  const result=await page(Ward,q,req.query);
+  cache.set(cacheKey,result,120,'wards');
+  res.set('X-Cache','MISS');
+  res.json(result);
 });
 adminRoutes.post('/wards',admin,async(req,res)=>{
   const body=wardFields.parse(req.body);await exists(Village,body.village);
@@ -81,7 +98,10 @@ for (const [path,model,validation] of [
         { new: true, session, runValidators: false }
       );
       if(path==='users'&&body.active===false)await Session.deleteMany({user:doc._id},{session});
-      await log(session,req.user,'update',path,doc._id,changes);return publicRecord(updated);
+      await log(session,req.user,'update',path,doc._id,changes);
+      cache.invalidateTag(path);
+      cache.invalidateTag('discovery');
+      return publicRecord(updated);
     });res.json(saved);
   });
 }

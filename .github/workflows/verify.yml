@@ -1,19 +1,64 @@
-name: Verify Village 360
-on: [push, pull_request]
+name: CI/CD Pipeline - Village 360
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
 jobs:
   verify:
+    name: Build, Test & Verify Full Stack
     runs-on: ubuntu-24.04
+    timeout-minutes: 20
     env:
       MONGOMS_DISABLE_POSTINSTALL: "1"
       MONGOMS_VERSION: "7.0.24"
+      CI: "true"
+
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js 22.x
+        uses: actions/setup-node@v4
         with:
           node-version: 22
-          cache: npm
-      - run: npm ci
-      - run: npm run build
-      - run: npm test
-      - run: npx playwright install --with-deps chromium
-      - run: npm run test:mobile
+          cache: 'npm'
+
+      - name: Install Dependencies
+        run: npm ci
+
+      - name: Build Frontend Application
+        run: npm run build
+
+      - name: Run Backend Integration & Unit Tests
+        run: npm test
+
+      - name: Cache Playwright Browsers
+        uses: actions/cache@v4
+        id: playwright-cache
+        with:
+          path: ~/.cache/ms-playwright
+          key: ${{ runner.os }}-playwright-${{ hashFiles('package-lock.json') }}
+
+      - name: Install Playwright Chromium with System Dependencies
+        if: steps.playwright-cache.outputs.cache-hit != 'true'
+        run: npx playwright install --with-deps chromium
+
+      - name: Install Playwright OS Dependencies (when cache hit)
+        if: steps.playwright-cache.outputs.cache-hit == 'true'
+        run: npx playwright install-deps chromium
+
+      - name: Run Mobile & Responsive Browser Tests
+        run: npm run test:mobile
+
+      - name: Upload Test Artifacts on Failure
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-test-results
+          path: |
+            frontend/test-results/
+            playwright-report/
+          retention-days: 7
