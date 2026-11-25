@@ -8,3 +8,13 @@ playwright-report/
 test-results/
 .vercel/
 *.log
+
+# GramAgent local runtime, secrets and caches
+.venv/
+.gramagent/
+.cache/
+__pycache__/
+.pytest_cache/
+*.pyc
+gramagent/web/dist/
+gramagent/.env

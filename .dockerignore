@@ -4,3 +4,8 @@
 **/.env.*
 .git
 **/test-results
+.venv
+.gramagent
+.cache
+**/__pycache__
+**/.pytest_cache

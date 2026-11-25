@@ -1,0 +1,25 @@
+name: GramAgent verification
+on:
+  push:
+    paths: ['gramagent/**', 'backend/src/routes/gramagent.js', 'package*.json', '.github/workflows/gramagent.yml']
+  pull_request:
+    paths: ['gramagent/**', 'backend/src/routes/gramagent.js', 'package*.json', '.github/workflows/gramagent.yml']
+permissions:
+  contents: read
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+      - run: python -m pip install -r gramagent/api/requirements.lock.txt
+      - run: PYTHONPATH=gramagent/api python -m pytest gramagent/api/tests -q
+      - run: npm ci
+      - run: npm run build:gramagent
+      - run: npm test

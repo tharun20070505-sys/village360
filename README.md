@@ -56,3 +56,9 @@ Open http://localhost:5173. Check the API at http://localhost:5000/api/health. U
 The integration suite uses synthetic records and an isolated disposable replica set. It needs access to a MongoDB binary on its first run. Set MONGOMS_SYSTEM_BINARY to an existing mongod binary if downloads are unavailable. To use an installed Chromium for mobile tests, set PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH to its executable.
 
 See [deployment and operations](docs/operations.md) for production setup.
+
+## GramAgent AI development intelligence
+
+The independent GramAgent application lives in `gramagent/`. It adds aggregate-data integration, persistent LangGraph assessments, evidence-based prioritisation, optional OpenAI/Gemini generation, human approval and impact monitoring. Existing Village 360 fieldwork remains available.
+
+See [GramAgent setup, integration and deployment](gramagent/docs/README.md). Start its interface with `npm run dev:gramagent` after configuring the API and worker.
