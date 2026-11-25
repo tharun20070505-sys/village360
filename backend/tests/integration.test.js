@@ -150,6 +150,28 @@ test('REST workflows against an isolated MongoDB replica set', {timeout: 300000}
     assert.ok(!result.body.includes(responses('households').householdRef));
     check(await call('/reports/export?type=households&format=csv',{session:field}),403);
   });
+  await t.test('GramAgent read-only export is scoped and suppresses small cells',async()=>{
+    process.env.GRAMAGENT_READ_TOKEN=randomBytes(32).toString('hex');
+    process.env.GRAMAGENT_VILLAGE_IDS=village._id;
+    const path='/gramagent/v1/snapshots/'+village._id;
+    check(await call(path),401);
+    const headers={Authorization:'Bearer '+process.env.GRAMAGENT_READ_TOKEN};
+    check(await call('/gramagent/v1/snapshots/'+otherVillage._id,{headers}),403);
+    const before=await mongoose.connection.db.collection('household_surveys').countDocuments();
+    const result=check(await call(path,{headers}),200);
+    assert.deepEqual(result.observations,[]);
+    assert.equal(result.synthetic,false);
+    assert.equal(await mongoose.connection.db.collection('household_surveys').countDocuments(),before);
+    assert.ok(!JSON.stringify(result).includes(responses('households').householdRef));
+    const source=await mongoose.connection.db.collection('household_surveys').findOne({publicId:household.publicId});
+    for(let i=0;i<10;i++){
+      const {_id, ...copy}=source;
+      await mongoose.connection.db.collection('household_surveys').insertOne({...copy,publicId:'GRAM-'+i,key:'gram-'+i,uniqueRef:'gram-'+i,status:'Verified',data:{...copy.data,waterAvailability:i<5?'Unavailable':'Reliable',consent:true}});
+    }
+    const full=check(await call(path,{headers}),200);
+    const water=full.observations.find(o=>o.sector==='Water supply');
+    assert.equal(water.value,5);assert.equal(water.denominator,10);
+  });
   await t.test('logout invalidates the server session',async()=>{
     check(await call('/auth/logout',{method:'POST',session:field}),[200,204]);
     check(await call('/auth/me',{session:field}),401);

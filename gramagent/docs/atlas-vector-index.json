@@ -1,0 +1,1 @@
+{"name":"gramagent_schemes","type":"vectorSearch","definition":{"fields":[{"type":"vector","path":"embedding","numDimensions":1536,"similarity":"cosine"},{"type":"filter","path":"organisation_id"},{"type":"filter","path":"reviewed"}]}}

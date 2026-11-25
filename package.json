@@ -1,1 +1,26 @@
-{"name":"village360","private":true,"version":"1.0.0","type":"module","workspaces":["frontend","backend"],"engines":{"node":">=22.12"},"scripts":{"dev":"concurrently -k \"npm run dev -w backend\" \"npm run dev -w frontend\"","build":"npm run build -w frontend","start":"npm start -w backend","test":"npm test -w backend","test:mobile":"npm run test:mobile -w frontend"},"devDependencies":{"concurrently":"^9.2.1"}}
+{
+  "name": "village360",
+  "private": true,
+  "version": "1.0.0",
+  "type": "module",
+  "workspaces": [
+    "frontend",
+    "backend",
+    "gramagent/web"
+  ],
+  "engines": {
+    "node": ">=22.12"
+  },
+  "scripts": {
+    "dev": "concurrently -k \"npm run dev -w backend\" \"npm run dev -w frontend\"",
+    "build": "npm run build -w frontend",
+    "start": "npm start -w backend",
+    "test": "npm test -w backend",
+    "test:mobile": "npm run test:mobile -w frontend",
+    "dev:gramagent": "npm run dev -w gramagent-web",
+    "build:gramagent": "npm run build -w gramagent-web"
+  },
+  "devDependencies": {
+    "concurrently": "^9.2.1"
+  }
+}

@@ -15,6 +15,7 @@ import { adminRoutes } from './routes/admin.js';
 import { adminMetricsRoutes } from './routes/adminMetrics.js';
 import { surveyRoutes } from './routes/surveys.js';
 import { reports } from './routes/reports.js';
+import { gramagent } from './routes/gramagent.js';
 import { discoveryRoutes } from './routes/discovery.js';
 
 export const app = express();
@@ -62,6 +63,7 @@ app.use('/api/surveys', surveySubmissionLimiter);
 app.use(browserOrigin, express.json({ limit: '128kb' }), cookieParser());
 
 // Public routes
+app.use('/api', gramagent);
 app.use('/api/auth', auth);
 app.use('/api', discoveryRoutes);
 
